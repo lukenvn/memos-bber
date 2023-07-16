@@ -17,16 +17,29 @@
       <path d="M510 366a146 146 0 1 0 1 292 146 146 0 0 0-1-292m87 146a87 87 0 1 1-173-1 87 87 0 0 1 173 1"/>
     </svg></div>
     <div id="blog_info" class="">
-        <input
-          id="apiUrl"
-          class="inputer"
-          name="apiUrl"
-          type="text"
-          value=""
-          maxlength="245"
-          placeholder=""
-          required
-        />
+        <div id="persist_info" >
+          <input
+                  id="apiUrl"
+                  class="inputer"
+                  name="apiUrl"
+                  type="text"
+                  value=""
+                  maxlength="245"
+                  placeholder=""
+                  required
+          />
+          <div class="memo-editor">
+              <textarea
+                      class="common-editor-inputer"
+                      rows="2"
+                      placeholder="Default memo prefix"
+                      name="prefix"
+                      id="messagePrefix"
+                      placeholder=""
+                      required=""
+              ></textarea>
+          </div>
+        </div>
         <span id="saveKey" class="action-btn confirm-btn"></span>
     </div>
 

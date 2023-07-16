@@ -1,5 +1,5 @@
 dayjs.extend(window.dayjs_plugin_relativeTime)
-dayjs.locale('zh-cn')
+dayjs.locale(chrome.i18n.getUILanguage())
 
 function get_info(callback) {
   chrome.storage.sync.get(
@@ -9,6 +9,7 @@ function get_info(callback) {
       showtag: '',
       memo_lock: '',
       open_action: '',
+      messagePrefix: '',
       open_content: '',
       resourceIdList: []
     },
@@ -25,10 +26,11 @@ function get_info(callback) {
       returnObject.hidetag = items.hidetag
       returnObject.showtag = items.showtag
       returnObject.memo_lock = items.memo_lock
+      returnObject.messagePrefix = items.messagePrefix
       returnObject.open_content = items.open_content
       returnObject.open_action = items.open_action
       returnObject.resourceIdList = items.resourceIdList
-
+      console.log(returnObject,items)
       if (callback) callback(returnObject)
     }
   )
@@ -54,17 +56,20 @@ get_info(function (info) {
     $("#lock-now").text(chrome.i18n.getMessage("lockProtected"))
   }
   $('#apiUrl').val(info.apiUrl)
+  $('#messagePrefix').val(info.messagePrefix)
   $('#hideInput').val(info.hidetag)
   $('#showInput').val(info.showtag)
+  $("#content").val(info.messagePrefix)
   if (info.open_action === 'upload_image') {
     //打开的时候就是上传图片
     uploadImage(info.open_content)
   } else {
-    $("textarea[name=text]").val(info.open_content)
+    updateContentWithPrefix(info.open_content);
   }
   //从localstorage 里面读取数据
   setTimeout(get_info, 1)
 })
+
 
 $("textarea[name=text]").focus()
 
@@ -164,7 +169,7 @@ function uploadImage(data) {
             relistNow.push(result.data.id)
             chrome.storage.sync.set(
               {
-                open_action: '', 
+                open_action: '',
                 open_content: '',
                 resourceIdList: relistNow
               },
@@ -178,7 +183,7 @@ function uploadImage(data) {
             //发送失败 清空open_action（打开时候进行的操作）,同时清空open_content
             chrome.storage.sync.set(
               {
-                open_action: '', 
+                open_action: '',
                 open_content: '',
                 resourceIdList: []
               },
@@ -199,16 +204,29 @@ function uploadImage(data) {
   })
 }
 
+function updateContentWithPrefix(content) {
+    const currentContent = content || $("#content").val();
+    const currentPrefix = $('#messagePrefix').val();
+    let newContent=currentContent;
+    if (!currentContent.startsWith(currentPrefix)) {
+       newContent =`${currentPrefix} ${currentContent}`;
+    }
+  $("#content").val(`${newContent}`);
+  $("#content").focus()
+}
+
 $('#saveKey').click(function () {
   chrome.storage.sync.set(
     {
-      apiUrl: $('#apiUrl').val()
+      apiUrl: $('#apiUrl').val(),
+      messagePrefix: $('#messagePrefix').val(),
     },
     function () {
       $.message({
         message: chrome.i18n.getMessage("saveSuccess")
       })
-      $('#blog_info').hide()
+      $('#blog_info').hide();
+      updateContentWithPrefix();
     }
   )
 })
@@ -466,7 +484,7 @@ function add(str) {
   if(typeof document.selection != "undefined"){
     document.selection.createRange().text = str;
   }else{
-    tc.value = 
+    tc.value =
       tc.value.substr(0, tc.selectionStart) +
       str +
       tc.value.substring(tc.selectionStart, tclen);
@@ -478,8 +496,10 @@ $('#blog_info_edit').click(function () {
 })
 
 $('#content_submit_text').click(function () {
-  var contentVal = $("textarea[name=text]").val()
-  if(contentVal){
+  const contentVal = $("textarea[name=text]").val()
+  const messagePrefix = $('#messagePrefix').val();
+  const contentWithoutPrefix=contentVal.replace(messagePrefix,'').trim();
+  if(contentWithoutPrefix){
     sendText()
   }else{
     $.message({
@@ -543,7 +563,7 @@ function sendText() {
                     message: chrome.i18n.getMessage("memoSuccess")
                   })
                   //$("#content_submit_text").removeAttr('disabled');
-                  $("textarea[name=text]").val('')
+                  updateContentWithPrefix(' ')
                 }
           )
       },error:function(err){//清空open_action（打开时候进行的操作）,同时清空open_content

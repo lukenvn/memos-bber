@@ -66,7 +66,7 @@ a{color: #555;}
     overflow-wrap: anywhere;
     word-break: normal;}
 .btns-container{text-align:right;}
-.common-editor-inputer,input.inputer{
+.common-editor-inputer,input.inputer,textarea{
     font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;
     height: 100%;
     width: 100%;
@@ -81,8 +81,11 @@ a{color: #555;}
     scrollbar-width: none;
     line-height: 1.5rem;
 }
-input.inputer{border-bottom: 1px solid #ccc;width:75%;}
-
+input.inputer{border-bottom: 1px solid #ccc;;}
+#persist_info{
+    width: 100%;
+    margin-right: 20px;
+}
 #saveKey{margin:0;flex:1;}
 
 .common-tools-wrapper {
@@ -169,7 +172,7 @@ input.inputer{border-bottom: 1px solid #ccc;width:75%;}
 #blog_info{
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
 }
 
